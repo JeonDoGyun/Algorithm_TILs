@@ -1,0 +1,27 @@
+SET @HOUR = -1;
+
+SELECT (@HOUR := @HOUR + 1) AS HOUR, IFNULL(B.COUNT, 0) AS COUNT
+FROM ANIMAL_OUTS A 
+    LEFT OUTER JOIN (
+        SELECT HOUR(DATETIME) AS HOUR, COUNT(*) AS COUNT
+        FROM ANIMAL_OUTS
+        WHERE HOUR(DATETIME) BETWEEN 0 AND 23
+        GROUP BY 1
+        ORDER BY 1
+    ) B ON @HOUR + 1 = B.HOUR
+WHERE @HOUR < 23
+
+-- 다른 방법
+-- WITH RECURSIVE cte (n)
+-- AS (
+    -- SELECT 0
+    -- UNION ALL
+    -- SELECT n+1
+    -- FROM cte
+    -- WHERE n < 23
+-- )
+
+-- SELECT cte.n, SUM(if(cte.n = HOUR(DATETIME), 1, 0)) COUNT
+-- FROM cte, ANIMAL_OUTS
+-- GROUP BY 1
+-- ORDER BY 1
